@@ -1,18 +1,36 @@
 DROP DATABASE IF EXISTS qa;
 CREATE DATABASE qa;
 
-CREATE TABLE question_overview (
-  id INTEGER PRIMARY KEY NOT NULL,
+\c qa;
+
+CREATE TABLE question_info (
+  id SERIAL PRIMARY KEY NOT NULL,
+  product_id INTEGER NOT NULL,
+  body VARCHAR(1024),
+  date_written VARCHAR(13),
+  asker_name VARCHAR(40),
+  asker_email VARCHAR(40),
+  reported BOOLEAN, -- CAST (1 AS BOOLEAN), CAST (0 AS BOOLEAN)
+  helpful INTEGER NOT NULL
 );
 
--- SERIAL data type allows you to automatically generate unique integer numbers (IDs, identity, auto-increment, sequence) for a column.
-CREATE TABLE question_info (
-  question_id SERIAL PRIMARY KEY NOT NULL,
-  product_id INTEGER REFERENCES question_overview(id),
-  question_body VARCHAR(100),
-  -- question_date VARCHAR(24),
-  asker_name: VARCHAR(50),
-                            -- DEAFAULT NULL?
-  question_helpfulness INTEGER NOT NULL,
-  reported BOOLEAN
-)
+CREATE TABLE answers (
+  id SERIAL PRIMARY KEY NOT NULL,
+  question_id INTEGER REFERENCES question_info(id),
+  body VARCHAR(1024),
+  date_written VARCHAR(13),
+  answerer_name VARCHAR(40),
+  answerer_email VARCHAR(40),
+  reported BOOLEAN, -- CAST (1 AS BOOLEAN), CAST (0 AS BOOLEAN)
+  helpful INTEGER NOT NULL
+);
+
+CREATE TABLE answer_photos (
+  id SERIAL PRIMARY KEY NOT NULL,
+  answer_id INTEGER REFERENCES answers(id),
+  url VARCHAR(200)
+);
+
+-- psql -U postgres -f db/schema.sql
+-- psql -U postgres -f db/import.sql
+-- psql -U postgres -f db/select.sql

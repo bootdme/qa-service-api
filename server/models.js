@@ -6,9 +6,34 @@ pool.on('error', (err) => {
 });
 
 module.exports = {
-  // Model routes go here
   getQuestions: (product_id, page, count) => pool.connect()
-    .then((client) => client.query(`SELECT * FROM question_info WHERE product_id = ${product_id} LIMIT ${page * count}`)
+    .then((client) => client.query(`
+      SELECT
+        q.product_id,
+        q.id AS question_id,
+        q.body AS question_body,
+        q.date_written AS question_date,
+        q.asker_name,
+        q.helpful AS question_helpfulness,
+        q.reported,
+        a.id,
+        a.body,
+        a.date_written AS date,
+        a.answerer_name,
+        a.answerer_email,
+        a.helpful AS helpfulness,
+        p.url
+      FROM
+        question_info q
+        LEFT JOIN answers a ON (q.id = a.question_id)
+        LEFT JOIN answer_photos p ON (a.id = p.answer_id)
+      WHERE
+        q.product_id = ${product_id}
+      ORDER BY
+        q.id ASC
+      LIMIT
+        ${page * count}
+    `)
       .then((res) => {
         client.release();
         return (res.rows);
@@ -18,7 +43,26 @@ module.exports = {
         return err;
       })),
   getAnswers: (question_id, page, count) => pool.connect()
-    .then((client) => client.query(`SELECT * FROM answers WHERE question_id = ${question_id} LIMIT ${page * count}`)
+    .then((client) => client.query(`
+      SELECT
+        a.id AS answer_id,
+        a.body,
+        a.date_written AS date,
+        a.answerer_name,
+        a.helpful AS helpfulness,
+        a.reported AS answerer_reported,
+        p.url,
+        p.id AS photo_id
+      FROM
+        answers a
+        LEFT JOIN answer_photos p on (a.id = p.answer_id)
+      WHERE
+        a.question_id = ${question_id}
+      ORDER BY
+        a.id ASC
+      LIMIT
+        ${page * count}
+    `)
       .then((res) => {
         client.release();
         return (res.rows);
@@ -27,14 +71,14 @@ module.exports = {
         client.release();
         return err;
       })),
-  getUrls: (answer_id, page, count) => pool.connect()
-    .then((client) => client.query(`SELECT * FROM answer_photos WHERE answer_id = ${answer_id} LIMIT ${page * count}`)
-      .then((res) => {
-        client.release();
-        return (res.rows);
-      })
-      .catch((err) => {
-        client.release();
-        return err;
-      })),
+  // getUrls: (answer_id, page, count) => pool.connect()
+  //   .then((client) => client.query(`SELECT * FROM answer_photos WHERE answer_id = ${answer_id} LIMIT ${page * count}`)
+  //     .then((res) => {
+  //       client.release();
+  //       return (res.rows);
+  //     })
+  //     .catch((err) => {
+  //       client.release();
+  //       return err;
+  //     })),
 };

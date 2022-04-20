@@ -22,20 +22,20 @@ module.exports = {
       .then((answers) => {
         res.status(200).send(answers);
       })
-      .catch((err) => {
+      .catch((err) => {z
         res.status(404).send(err);
       });
   },
-  getUrls: (req, res) => {
-    const { answer_id } = req.params;
-    const page = req.query.page || 1;
-    const count = req.query.count || 5;
-    models.getUrls(answer_id, page, count)
-      .then((urls) => {
-        res.status(200).send(urls);
-      })
-      .catch((err) => {
-        res.status(404).send(err);
-      });
-  },
+  // getUrls: (req, res) => {
+  //   const { answer_id } = req.params;
+  //   const page = req.query.page || 1;
+  //   const count = req.query.count || 5;
+  //   models.getUrls(answer_id, page, count)
+  //     .then((urls) => {
+  //       res.status(200).send(urls);
+  //     })
+  //     .catch((err) => {
+  //       res.status(404).send(err);
+  //     });
+  // },
 };

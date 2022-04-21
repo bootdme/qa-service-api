@@ -5,36 +5,41 @@ CREATE DATABASE qa;
 
 -- id is question_id
 CREATE TABLE question_info (
-  id SERIAL PRIMARY KEY NOT NULL,
-  product_id INTEGER NOT NULL,
+  id SERIAL PRIMARY KEY,
+  product_id INTEGER,
   body VARCHAR(1024),
-  date_written VARCHAR(13),
+  date_written BIGSERIAL,
   asker_name VARCHAR(40),
   asker_email VARCHAR(40),
   reported BOOLEAN, -- CAST (1 AS BOOLEAN), CAST (0 AS BOOLEAN)
-  helpful INTEGER NOT NULL
+  helpful INTEGER
 );
 
-CREATE INDEX idx_qi_product_id ON question_info(product_id);
 
 CREATE TABLE answers (
-  id SERIAL PRIMARY KEY NOT NULL,
-  question_id INTEGER NOT NULL REFERENCES question_info(id) ON DELETE CASCADE,
+  id SERIAL PRIMARY KEY,
+  question_id INTEGER REFERENCES question_info(id) ON DELETE CASCADE,
   body VARCHAR(1024),
-  date_written VARCHAR(13),
+  date_written BIGSERIAL,
   answerer_name VARCHAR(40),
   answerer_email VARCHAR(40),
   reported BOOLEAN, -- CAST (1 AS BOOLEAN), CAST (0 AS BOOLEAN)
-  helpful INTEGER NOT NULL
+  helpful INTEGER
 );
-
-CREATE INDEX idx_a_question_id ON answers(question_id);
 
 CREATE TABLE answer_photos (
-  id SERIAL PRIMARY KEY NOT NULL,
-  answer_id INTEGER NOT NULL REFERENCES answers(id) ON DELETE CASCADE,
-  url VARCHAR(200) NOT NULL
+  id SERIAL PRIMARY KEY,
+  answer_id INTEGER REFERENCES answers(id) ON DELETE CASCADE,
+  url VARCHAR(200)
 );
+
+CREATE INDEX idx_qi_product_id ON question_info(product_id);
+CREATE INDEX idx_qi_reported ON question_info(reported);
+CREATE INDEX idx_qi_helpful ON question_info(helpful);
+
+CREATE INDEX idx_a_question_id ON answers(question_id);
+CREATE INDEX idx_a_reported ON answers(reported);
+CREATE INDEX idx_a_helpful ON answers(helpful);
 
 CREATE INDEX idx_ap_answer_photos ON answer_photos(answer_id);
 
@@ -43,4 +48,4 @@ CREATE INDEX idx_ap_answer_photos ON answer_photos(answer_id);
 \copy answer_photos FROM './csv/answers_photos.csv' WITH (FORMAT CSV, HEADER);
 
 -- psql -U postgres -f db/schema.sql
--- psql -U postgres -f db/select.sql
+-- psql -U postgres -f db/queries.sql

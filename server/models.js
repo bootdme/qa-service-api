@@ -8,12 +8,30 @@ pool.on('error', (err) => {
 module.exports = {
   getQuestions: (product_id, page, count) => pool.connect()
     .then((client) => client.query(`
-      SELECT
-        *
-      FROM
-        question_info
-      LIMIT
-        ${page * count}
+    SELECT q.id                                                     AS question_id,
+           q.body                                                   AS question_body,
+           q.date_written                                           AS question_date,
+           q.asker_name,
+           q.helpful                                                AS question_helpfulness,
+           q.reported,
+           Coalesce((SELECT Array_to_json(Array_agg(Row_to_json(c)))
+                     FROM   (SELECT a.id,
+                                    a.body,
+                                    a.date_written                  AS date,
+                                    a.answerer_name,
+                                    a.helpful                       AS helpfulness,
+                             Coalesce((SELECT Array_to_json(Array_agg(Row_to_json(d)))
+                                       FROM   (SELECT ap.id,
+                                                      ap.url
+                                               FROM   answer_photos ap
+                                       INNER JOIN answers a
+                                       ON ( ap.answer_id = a.id )
+                                       WHERE  a.question_id = q.id) d), '[]') AS photos
+                             FROM   answers a
+                             WHERE  a.question_id = q.id) c), '[]') AS answers
+    FROM   question_info q
+    WHERE  product_id = ${product_id}
+    LIMIT  ${page * count}
     `)
       .then((res) => {
         client.release();
@@ -25,36 +43,19 @@ module.exports = {
       })),
   getAnswers: (question_id, page, count) => pool.connect()
     .then((client) => client.query(`
-    SELECT
-      a.id AS answer_id,
-      a.body,
-      a.date_written AS date,
-      a.answerer_name,
-      a.helpful AS helpfulness,
-      (
-        SELECT
-        array_to_json(
-          array_agg(
-            row_to_json(d)
-          )
-        )
-        FROM
-          (
-            SELECT
-              ap.id,
-              ap.url
-            FROM
-              answer_photos ap
-            WHERE
-              ap.id = a.id
-          ) d
-      ) AS photos
-    FROM
-      answers a
-    WHERE
-      a.question_id = ${question_id}
-    LIMIT
-      ${page * count}
+    SELECT a.id                                                    AS answer_id,
+           a.body,
+           a.date_written                                          AS date,
+           a.answerer_name,
+           a.helpful                                               AS helpfulness,
+           Coalesce((SELECT Array_to_json(Array_agg(Row_to_json(d)))
+                     FROM   (SELECT ap.id,
+                                    ap.url
+                             FROM   answer_photos ap
+                             WHERE  ap.answer_id = a.id) d), '[]') AS photos
+    FROM   answers a
+    WHERE  a.question_id = ${question_id}
+    LIMIT  ${page * count}
     `)
       .then((res) => {
         client.release();

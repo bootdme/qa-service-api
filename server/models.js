@@ -22,6 +22,7 @@ module.exports = {
         a.answerer_name,
         a.answerer_email,
         a.helpful AS helpfulness,
+        a.reported AS answer_reported,
         p.url
       FROM
         question_info q
@@ -71,14 +72,4 @@ module.exports = {
         client.release();
         return err;
       })),
-  // getUrls: (answer_id, page, count) => pool.connect()
-  //   .then((client) => client.query(`SELECT * FROM answer_photos WHERE answer_id = ${answer_id} LIMIT ${page * count}`)
-  //     .then((res) => {
-  //       client.release();
-  //       return (res.rows);
-  //     })
-  //     .catch((err) => {
-  //       client.release();
-  //       return err;
-  //     })),
 };

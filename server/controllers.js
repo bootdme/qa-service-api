@@ -6,12 +6,13 @@ module.exports = {
     const { product_id } = req.query;
     const page = req.query.page || 1;
     const count = req.query.count || 5;
+
     models.getQuestions(product_id, page, count)
       .then((questions) => {
         res.status(200).send(questions);
       })
       .catch((err) => {
-        res.send(404).send(err);
+        res.status(404).send(err);
       });
   },
   getAnswers: (req, res) => {
@@ -22,20 +23,8 @@ module.exports = {
       .then((answers) => {
         res.status(200).send(answers);
       })
-      .catch((err) => {z
+      .catch((err) => {
         res.status(404).send(err);
       });
   },
-  // getUrls: (req, res) => {
-  //   const { answer_id } = req.params;
-  //   const page = req.query.page || 1;
-  //   const count = req.query.count || 5;
-  //   models.getUrls(answer_id, page, count)
-  //     .then((urls) => {
-  //       res.status(200).send(urls);
-  //     })
-  //     .catch((err) => {
-  //       res.status(404).send(err);
-  //     });
-  // },
 };

@@ -17,9 +17,9 @@ module.exports = {
            Coalesce((SELECT Array_to_json(Array_agg(Row_to_json(c)))
                      FROM   (SELECT a.id,
                                     a.body,
-                                    a.date_written                  AS date,
+                                    a.date_written                                    AS date,
                                     a.answerer_name,
-                                    a.helpful                       AS helpfulness,
+                                    a.helpful                                         AS helpfulness,
                              Coalesce((SELECT Array_to_json(Array_agg(Row_to_json(d)))
                                        FROM   (SELECT ap.id,
                                                       ap.url

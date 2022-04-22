@@ -24,6 +24,18 @@ describe('questions', () => {
         const response = await supertest(app).get('/questions?product_id=9999999999');
         expect(response.status).toEqual(404);
       });
+      it('should expect an object for a product id', async () => {
+        const response = await supertest(app).get('/questions?product_id=963066');
+        expect(typeof response.body).toEqual('object');
+      });
+      it('should have a product_id key as a string and results as an array', async () => {
+        const response = await supertest(app).get('/questions?product_id=2366345');
+        expect(response.body.product_id).toBeDefined();
+        expect(response.body.results).toBeDefined();
+        expect(typeof response.body.product_id).toEqual('string');
+        expect(typeof response.body.results).toEqual('object');
+      });
+      /* Write more later */
     })
   })
 })

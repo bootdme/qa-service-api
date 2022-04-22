@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watchAll --config ./jest.config.js",
+    "test": "jest --watchAll --detectOpenHandles --config ./jest.config.js",
     "start": "nodemon server/index.js"
   },
   "repository": {

@@ -6,67 +6,69 @@ pool.on('error', (err) => {
 });
 
 module.exports = {
-  getQuestions: (product_id, size) => pool.connect()
-    .then((client) => client.query(`
-    SELECT q.id           AS question_id,
-           q.body         AS question_body,
-           q.date_written AS question_date,
-           q.asker_name,
-           q.helpful AS question_helpfulness,
-           q.reported,
-           (
-                  SELECT Array_to_json(COALESCE(Array_agg(c), array[]::record[]))
-                  FROM   (
-                                SELECT a.id,
-                                       a.body,
-                                       a.date_written AS date,
-                                       a.answerer_name,
-                                       a.helpful AS helpfulness,
-                                       (
-                                              SELECT Array_to_json(COALESCE(Array_agg(d), array[]::record[]))
-                                              FROM   (
-                                                                SELECT     ap.id,
-                                                                           ap.url
-                                                                FROM       answer_photos ap
-                                                                INNER JOIN answers a
-                                                                ON         ( ap.answer_id = a.id )
-                                                                WHERE      a.question_id = q.id ) d ) AS photos
-                                FROM   answers a
-                         WHERE  a.question_id = q.id ) c ) AS answers
-    FROM   question_info q
-    WHERE  product_id = $1 LIMIT $2
-    `, [product_id, size])
-      .then((res) => {
-        client.release();
-        return (res.rows);
-      })
-      .catch((err) => {
-        client.release();
-        return err;
-      })),
-  getAnswers: (question_id, size) => pool.connect()
-    .then((client) => client.query(`
-    SELECT a.id             AS answer_id,
-           a.body,
-           a.date_written   AS date,
-           a.answerer_name,
-           a.helpful        AS helpfulness,
-           (
-                  SELECT Array_to_json(COALESCE(Array_agg(d), array[]::record[]))
-                  FROM   (
-                                SELECT ap.id,
-                                       ap.url
-                                FROM   answer_photos ap
-                                WHERE  ap.answer_id = a.id ) d ) AS photos
-    FROM   answers a
-    WHERE  a.question_id = $1 LIMIT $2
-    `, [question_id, size])
-      .then((res) => {
-        client.release();
-        return (res.rows);
-      })
-      .catch((err) => {
-        client.release();
-        return err;
-      })),
+  getQuestions: (product_id, size) => {
+    const questionQuery = new Promise((resolve, reject) => {
+      pool.query(`
+          SELECT q.id           AS question_id,
+                q.body         AS question_body,
+                q.date_written AS question_date,
+                q.asker_name,
+                q.helpful      AS question_helpfulness,
+                q.reported,
+                (
+                        SELECT Array_to_json(COALESCE(Array_agg(c), array[]::record[]))
+                        FROM   (
+                                      SELECT a.id,
+                                            a.body,
+                                            a.date_written AS date,
+                                            a.answerer_name,
+                                            a.helpful AS helpfulness,
+                                            (
+                                                    SELECT Array_to_json(COALESCE(Array_agg(d), array[]::record[]))
+                                                    FROM   (
+                                                                      SELECT     ap.id,
+                                                                                ap.url
+                                                                      FROM       answer_photos ap
+                                                                      INNER JOIN answers a
+                                                                      ON         ( ap.answer_id = a.id )
+                                                                      WHERE      a.question_id = q.id ) d ) AS photos
+                                      FROM   answers a
+                              WHERE  a.question_id = q.id ) c ) AS answers
+          FROM   question_info q
+          WHERE  product_id = $1 LIMIT $2
+      `, [product_id, size], (err, results) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve(results.rows);
+      });
+    });
+    return questionQuery;
+  },
+  getAnswers: (question_id, size) => {
+    const answerQuery = new Promise((resolve, reject) => {
+      pool.query(`
+          SELECT a.id             AS answer_id,
+                 a.body,
+                 a.date_written   AS date,
+                 a.answerer_name,
+                 a.helpful        AS helpfulness,
+                 (
+                        SELECT Array_to_json(COALESCE(Array_agg(d), array[]::record[]))
+                        FROM   (
+                                      SELECT ap.id,
+                                             ap.url
+                                      FROM   answer_photos ap
+                                      WHERE  ap.answer_id = a.id ) d ) AS photos
+          FROM   answers a
+          WHERE  a.question_id = $1 LIMIT $2
+      `, [question_id, size], (err, results) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve(results.rows);
+      });
+    });
+    return answerQuery;
+  },
 };

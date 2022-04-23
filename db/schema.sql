@@ -8,19 +8,18 @@ CREATE TABLE question_info (
   id SERIAL PRIMARY KEY,
   product_id INTEGER,
   body VARCHAR(1024),
-  date_written BIGSERIAL,
+  date_written BIGINT,
   asker_name VARCHAR(40),
   asker_email VARCHAR(40),
   reported BOOLEAN, -- CAST (1 AS BOOLEAN), CAST (0 AS BOOLEAN)
   helpful INTEGER
 );
 
-
 CREATE TABLE answers (
   id SERIAL PRIMARY KEY,
   question_id INTEGER REFERENCES question_info(id) ON DELETE CASCADE,
   body VARCHAR(1024),
-  date_written BIGSERIAL,
+  date_written BIGINT,
   answerer_name VARCHAR(40),
   answerer_email VARCHAR(40),
   reported BOOLEAN, -- CAST (1 AS BOOLEAN), CAST (0 AS BOOLEAN)
@@ -47,5 +46,15 @@ CREATE INDEX idx_ap_answer_photos ON answer_photos(answer_id);
 \copy answers FROM './csv/answers.csv' WITH (FORMAT CSV, HEADER);
 \copy answer_photos FROM './csv/answers_photos.csv' WITH (FORMAT CSV, HEADER);
 
+SELECT setval('question_info_id_seq', (SELECT MAX(id) FROM question_info));
+SELECT setval('answers_id_seq', (SELECT MAX(id) FROM answers));
+SELECT setval('answer_photos_id_seq', (SELECT MAX(id) FROM answer_photos));
+
+-- TODO: Change this
+UPDATE question_info SET date_written=date_written/1000;
+ALTER TABLE question_info ALTER date_written TYPE TIMESTAMP WITHOUT TIME ZONE USING to_timestamp(date_written) AT TIME ZONE 'UTC';
+
+UPDATE answers SET date_written=date_written/1000;
+ALTER TABLE answers ALTER date_written TYPE TIMESTAMP WITHOUT TIME ZONE USING to_timestamp(date_written) AT TIME ZONE 'UTC';
+
 -- psql -U postgres -f db/schema.sql
--- psql -U postgres -f db/queries.sql

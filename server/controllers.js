@@ -28,4 +28,13 @@ module.exports = {
       res.status(404).send('Error: invalid question id provided');
     }
   },
+  addQuestion: async (req, res) => {
+    try {
+      const { body, name, email, product_id } = req.body;
+      const result = await models.addQuestion(body, name, email, product_id);
+      res.status(201).send('Created');
+    } catch (err) {
+      res.status(422).send('Error: Question body contains invalid entries');
+    }
+  }
 };

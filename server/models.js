@@ -50,7 +50,7 @@ module.exports = {
       pool.query(`
           SELECT a.id             AS answer_id,
                  a.body,
-                 a.date_written   AS date,
+                 a.date_written  AS date,
                  a.answerer_name,
                  a.helpful        AS helpfulness,
                  (
@@ -70,5 +70,25 @@ module.exports = {
       });
     });
     return answerQuery;
+  },
+  // TODO: Figure out date conversion instead of converting when running schema
+  addQuestion: (body, name, email, product_id) => {
+    const date = new Date();
+    const questionQuery = new Promise((resolve, reject) => {
+      pool.query(`
+      WITH addQuestion AS (
+        INSERT INTO question_info (product_id, body, date_written, asker_name, asker_email, reported, helpful)
+        VALUES ($1, $2, $3, $4, $5, false, 0)
+        RETURNING *
+      )
+      SELECT nextval('question_info_id_seq');
+      `, [product_id, body, date.toISOString(), name, email], (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve(result.rows);
+      });
+    });
+    return questionQuery;
   },
 };

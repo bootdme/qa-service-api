@@ -36,5 +36,5 @@ module.exports = {
     } catch (err) {
       res.status(422).send('Error: Question body contains invalid entries');
     }
-  }
+  },
 };

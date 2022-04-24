@@ -42,9 +42,9 @@ CREATE INDEX idx_a_helpful ON answers(helpful);
 
 CREATE INDEX idx_ap_answer_photos ON answer_photos(answer_id);
 
-\copy question_info FROM './csv/questions.csv' WITH (FORMAT CSV, HEADER);
-\copy answers FROM './csv/answers.csv' WITH (FORMAT CSV, HEADER);
-\copy answer_photos FROM './csv/answers_photos.csv' WITH (FORMAT CSV, HEADER);
+\copy question_info FROM './csv/questions.csv' WITH (FORMAT CSV, DELIMITER ",", HEADER);
+\copy answers FROM './csv/answers.csv' WITH (FORMAT CSV, DELIMITER ",", HEADER);
+\copy answer_photos FROM './csv/answers_photos.csv' WITH (FORMAT CSV, DELIMITER ",", HEADER);
 
 SELECT setval('question_info_id_seq', (SELECT MAX(id) FROM question_info));
 SELECT setval('answers_id_seq', (SELECT MAX(id) FROM answers));

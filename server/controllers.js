@@ -37,4 +37,15 @@ module.exports = {
       res.status(422).send('Error: Question body contains invalid entries');
     }
   },
+  addAnswer: async (req, res) => {
+    try {
+      const { body, name, email, photos } = req.body;
+      const { question_id } = req.params;
+      const result = await models.addAnswer(body, name, email, photos, question_id);
+      res.status(201).send('Created');
+    } catch (err) {
+      console.log(err);
+      res.status(404).send('Error');
+    }
+  },
 };

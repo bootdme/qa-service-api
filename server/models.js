@@ -7,40 +7,49 @@ pool.on('error', (err) => {
 });
 
 module.exports = {
-  getQuestions: (product_id, size) => {
+  getQuestions: async (product_id, size) => {
     // TODO: Fix updating helpful/reported, question_id needs to be in the right place (ORDER BY bug)
     const psql = `
-    SELECT q.id           AS question_id,
-           q.body         AS question_body,
-           q.date_written AS question_date,
-           q.asker_name,
-           q.helpful      AS question_helpfulness,
-           q.reported,
-           (
-                  SELECT Array_to_json(COALESCE(Array_agg(c), array[]::record[]))
-                  FROM   (
-                                SELECT a.id,
-                                      a.body,
-                                      a.date_written AS date,
-                                      a.answerer_name,
-                                      a.helpful AS helpfulness,
-                                      (
-                                              SELECT Array_to_json(COALESCE(Array_agg(d), array[]::record[]))
-                                              FROM   (
-                                                                SELECT     ap.id,
-                                                                           ap.url
-                                                                FROM       answer_photos ap
-                                                                INNER JOIN answers a
-                                                                ON         ( ap.answer_id = a.id )
-                                                                WHERE      a.question_id = q.id ) d ) AS photos
-                                FROM   answers a
-                        WHERE  a.question_id = q.id ) c ) AS answers
-    FROM   question_info q
-    WHERE  product_id = $1 LIMIT $2`;
-    const results = pool.query(psql, [product_id, size]);
-    return results;
+    SELECT
+    product_id,
+    json_agg(
+      json_build_object(
+        'question_id', q.id,
+        'question_body', q.body,
+        'question_date', q.date_written,
+        'asker_name', q.asker_name,
+        'question_helpfulness', q.helpful,
+        'reported', q.reported,
+        'answers', (SELECT answers FROM (
+          SELECT json_object_agg(
+            a.id, json_build_object(
+              'id', a.id,
+              'body', a.body,
+              'date', a.date_written,
+              'answerer_name', a.answerer_name,
+              'helpfulness', a.helpful,
+              'photos', (
+                SELECT COALESCE(json_agg(d), '[]'::json)
+                FROM (
+                  SELECT ap.id,
+                         ap.url
+                  FROM answer_photos ap
+                  INNER JOIN answers a
+                  ON (ap.answer_id = a.id)
+                  WHERE a.question_id = q.id
+                ) d
+              )
+            )
+          ) AS answers
+          FROM answers a WHERE a.question_id = q.id
+        ) AS answers)
+      )
+    ) as results
+    FROM question_info q WHERE q.product_id = $1 AND q.reported = 'f' GROUP BY q.product_id LIMIT $2;`;
+    const results = await pool.query(psql, [product_id, size]);
+    return results.rows;
   },
-  getAnswers: (question_id, size) => {
+  getAnswers: async (question_id, size) => {
     const psql = `
     SELECT
     json_agg(
@@ -63,8 +72,8 @@ module.exports = {
   ) AS results
   FROM answers a
   WHERE a.question_id = $1 LIMIT $2`;
-    const results = pool.query(psql, [question_id, size]);
-    return results;
+    const results = await pool.query(psql, [question_id, size]);
+    return results.rows;
   },
   // TODO: Figure out date conversion instead of converting when running schema
   addQuestion: (body, name, email, product_id) => {

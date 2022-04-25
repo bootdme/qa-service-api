@@ -9,7 +9,7 @@ module.exports = {
       const count = req.query.count || 5;
       const size = page * count;
       const result = await models.getQuestions(product_id, size);
-      res.json({ product_id, results: result.rows });
+      res.send(result[0]);
     } catch (err) {
       res.status(404).send('Error: invalid product id provided');
     }
@@ -21,8 +21,7 @@ module.exports = {
       const count = Number(req.query.count) || 5;
       const size = page * count;
       const result = await models.getAnswers(question_id, size);
-      console.log(result.rows.results);
-      res.json({ question: question_id, page, count });
+      res.send({ question: question_id, page: page, count: count, results: result[0].results });
     } catch (err) {
       res.status(404).send('Error: invalid question id provided');
     }

@@ -11,7 +11,6 @@ module.exports = {
       const result = await models.getQuestions(product_id, size);
       res.json({ product_id, results: result.rows });
     } catch (err) {
-      console.log(err);
       res.status(404).send('Error: invalid product id provided');
     }
   },
@@ -22,9 +21,8 @@ module.exports = {
       const count = Number(req.query.count) || 5;
       const size = page * count;
       const result = await models.getAnswers(question_id, size);
-      res.json({
-        question: question_id, page, count, results: result.rows,
-      });
+      console.log(result.rows.results);
+      res.json({ question: question_id, page, count });
     } catch (err) {
       res.status(404).send('Error: invalid question id provided');
     }
@@ -49,7 +47,6 @@ module.exports = {
       const result = await models.addAnswer(body, name, email, photos, question_id);
       res.status(201).send('Created');
     } catch (err) {
-      console.log(err);
       res.status(404).send('Error');
     }
   },

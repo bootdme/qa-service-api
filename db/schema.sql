@@ -32,19 +32,13 @@ CREATE TABLE answer_photos (
   url VARCHAR(200)
 );
 
-CREATE INDEX idx_qi_product_id ON question_info(product_id);
-CREATE INDEX idx_qi_reported ON question_info(reported);
-CREATE INDEX idx_qi_helpful ON question_info(helpful);
-
-CREATE INDEX idx_a_question_id ON answers(question_id);
-CREATE INDEX idx_a_reported ON answers(reported);
-CREATE INDEX idx_a_helpful ON answers(helpful);
-
-CREATE INDEX idx_ap_answer_photos ON answer_photos(answer_id);
-
 \copy question_info FROM './csv/questions.csv' WITH (FORMAT CSV, DELIMITER ",", HEADER);
 \copy answers FROM './csv/answers.csv' WITH (FORMAT CSV, DELIMITER ",", HEADER);
 \copy answer_photos FROM './csv/answers_photos.csv' WITH (FORMAT CSV, DELIMITER ",", HEADER);
+
+CREATE INDEX idx_qi_product_id ON question_info(product_id);
+CREATE INDEX idx_a_question_id ON answers(question_id);
+CREATE INDEX idx_ap_answer_photos ON answer_photos(answer_id);
 
 -- TODO: Change this
 UPDATE question_info SET date_written=date_written/1000;
@@ -53,4 +47,9 @@ ALTER TABLE question_info ALTER date_written TYPE TIMESTAMP WITHOUT TIME ZONE US
 UPDATE answers SET date_written=date_written/1000;
 ALTER TABLE answers ALTER date_written TYPE TIMESTAMP WITHOUT TIME ZONE USING to_timestamp(date_written) AT TIME ZONE 'UTC';
 
+SELECT setval('question_info_id_seq', (SELECT MAX(id) FROM question_info));
+SELECT setval('answers_id_seq', (SELECT MAX(id) FROM answers));
+SELECT setval('answer_photos_id_seq', (SELECT MAX(id) FROM answer_photos));
+
 -- psql -U postgres -f db/schema.sql
+-- psql -U postgres -f db/test.sql

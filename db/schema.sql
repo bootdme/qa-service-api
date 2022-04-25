@@ -46,10 +46,6 @@ CREATE INDEX idx_ap_answer_photos ON answer_photos(answer_id);
 \copy answers FROM './csv/answers.csv' WITH (FORMAT CSV, DELIMITER ",", HEADER);
 \copy answer_photos FROM './csv/answers_photos.csv' WITH (FORMAT CSV, DELIMITER ",", HEADER);
 
-SELECT setval('question_info_id_seq', (SELECT MAX(id) FROM question_info));
-SELECT setval('answers_id_seq', (SELECT MAX(id) FROM answers));
-SELECT setval('answer_photos_id_seq', (SELECT MAX(id) FROM answer_photos));
-
 -- TODO: Change this
 UPDATE question_info SET date_written=date_written/1000;
 ALTER TABLE question_info ALTER date_written TYPE TIMESTAMP WITHOUT TIME ZONE USING to_timestamp(date_written) AT TIME ZONE 'UTC';

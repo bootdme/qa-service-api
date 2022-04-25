@@ -9,8 +9,9 @@ module.exports = {
       const count = req.query.count || 5;
       const size = page * count;
       const result = await models.getQuestions(product_id, size);
-      res.json({ product_id, results: result });
+      res.json({ product_id, results: result.rows });
     } catch (err) {
+      console.log(err);
       res.status(404).send('Error: invalid product id provided');
     }
   },
@@ -22,7 +23,7 @@ module.exports = {
       const size = page * count;
       const result = await models.getAnswers(question_id, size);
       res.json({
-        question: question_id, page, count, results: result,
+        question: question_id, page, count, results: result.rows,
       });
     } catch (err) {
       res.status(404).send('Error: invalid question id provided');
@@ -30,7 +31,9 @@ module.exports = {
   },
   addQuestion: async (req, res) => {
     try {
-      const { body, name, email, product_id } = req.body;
+      const {
+        body, name, email, product_id,
+      } = req.body;
       const result = await models.addQuestion(body, name, email, product_id);
       res.status(201).send('Created');
     } catch (err) {
@@ -39,13 +42,51 @@ module.exports = {
   },
   addAnswer: async (req, res) => {
     try {
-      const { body, name, email, photos } = req.body;
+      const {
+        body, name, email, photos,
+      } = req.body;
       const { question_id } = req.params;
       const result = await models.addAnswer(body, name, email, photos, question_id);
       res.status(201).send('Created');
     } catch (err) {
       console.log(err);
       res.status(404).send('Error');
+    }
+  },
+  markQHelpful: async (req, res) => {
+    try {
+      const { question_id } = req.params;
+      const result = await models.markQHelpful(question_id);
+      res.sendStatus(204);
+    } catch (err) {
+      res.status(404).send('Error: invalid question id provided');
+    }
+  },
+  markQReported: async (req, res) => {
+    try {
+      const { question_id } = req.params;
+      const result = await models.markQReported(question_id);
+      res.sendStatus(204);
+    } catch (err) {
+      res.status(404).send('Error: invalid question id provided');
+    }
+  },
+  markAHelpful: async (req, res) => {
+    try {
+      const { answer_id } = req.params;
+      const result = await models.markAHelpful(answer_id);
+      res.sendStatus(204);
+    } catch (err) {
+      res.status(404).send('Error: invalid answer id provided');
+    }
+  },
+  markAReported: async (req, res) => {
+    try {
+      const { answer_id } = req.params;
+      const result = await models.markAReported(answer_id);
+      res.sendStatus(204);
+    } catch (err) {
+      res.status(404).send('Error: invalid answer id provided');
     }
   },
 };

@@ -35,7 +35,6 @@ describe('questions', () => {
         expect(typeof response.body.product_id).toEqual('string');
         expect(typeof response.body.results).toEqual('object');
       });
-      /* Write more later */
     })
   })
 })

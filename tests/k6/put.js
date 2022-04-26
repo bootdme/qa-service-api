@@ -2,12 +2,6 @@ import http from 'k6/http';
 import { sleep } from 'k6';
 import { Trend } from 'k6/metrics';
 
-const getQuestionsTrend = new Trend('Get Questions');
-const getAnswersTrend = new Trend('Get Answers');
-
-const postQuestionTrend = new Trend('Add Question');
-const postAnswerTrend = new Trend('Add Answer');
-
 const putQuestionHelpfulTrend = new Trend('Update Question Helpful');
 const putQuestionReportedTrend = new Trend('Update Question Reported');
 const putAnswerHelpfulTrend = new Trend('Update Answer Helpful');
@@ -17,15 +11,15 @@ export const options = {
   InsecureSkipTLSVerify: true,
   noConnectionReuse: false,
   stages: [
-    { duration: '10s', target: 1000 },
-    { duration: '10s', target: 1000 },
     // { duration: '10s', target: 100 },
-    // { duration: '20s', target: 250 },
-    // { duration: '20s', target: 500 },
-    // { duration: '25s', target: 750 },
-    // { duration: '10s', target: 1000 },
-    // { duration: '10s', target: 1000 },
-    // { duration: '10s', target: 300 },
+    // { duration: '10s', target: 100 },
+    { duration: '10s', target: 100 },
+    { duration: '20s', target: 250 },
+    { duration: '20s', target: 500 },
+    { duration: '25s', target: 750 },
+    { duration: '10s', target: 1000 },
+    { duration: '10s', target: 1000 },
+    { duration: '10s', target: 300 },
   ],
   thresholds: {
     http_req_duration: ['p(95)<200'],
@@ -36,42 +30,12 @@ export const options = {
 export default () => {
   const questionAPI = 'http://localhost:8008/qa/questions';
   const answerAPI = 'http://localhost:8008/qa/answers';
-  const maxOne = 1000011;
   const maxTwo = 3523507;
   const maxThree = 6879325;
-  const randomIdOne = Math.floor(Math.random() * maxOne);
   const randomIdTwo = Math.floor(Math.random() * maxTwo);
   const randomIdThree = Math.floor(Math.random() * maxThree);
 
   const requests = {
-    'Get Questions': {
-      method: 'GET',
-      url: `${questionAPI}?product_id=${randomIdOne}`,
-    },
-    'Get Answers': {
-      method: 'GET',
-      url: `${questionAPI}/${randomIdOne}/answers`,
-    },
-    'Add Question': {
-      method: 'POST',
-      url: questionAPI,
-      body: {
-        body: 'This is k6 body text',
-        name: 'This is k6 name text',
-        email: 'This is k6 email text',
-        product_id: randomIdOne,
-      },
-    },
-    'Add Answer': {
-      method: 'POST',
-      url: `${questionAPI}/${randomIdTwo}/answers`,
-      body: {
-        body: 'This is k6 body text',
-        name: 'This is k6 name text',
-        email: 'This is k6 email text',
-        photos: ['random photo 1', 'random photo 2', 'random photo 3'],
-      },
-    },
     'Update Question Helpful': {
       method: 'PUT',
       url: `${questionAPI}/${randomIdTwo}/helpful`,
@@ -91,22 +55,10 @@ export default () => {
   };
   const responses = http.batch(requests);
 
-  const getQuestionsResponse = responses['Get Questions'];
-  const getAnswersResponse = responses['Get Answers'];
-
-  const addQuestionResponse = responses['Add Question'];
-  const addAnswerResponse = responses['Add Answer'];
-
   const updateQHelpfulResponse = responses['Update Question Helpful'];
   const updateQReportedResponse = responses['Update Question Reported'];
   const updateAHelpfulResponse = responses['Update Answer Helpful'];
   const updateAReportedResponse = responses['Update Answer Reported'];
-
-  getQuestionsTrend.add(getQuestionsResponse.timings.duration);
-  getAnswersTrend.add(getAnswersResponse.timings.duration);
-
-  postQuestionTrend.add(addQuestionResponse.timings.duration);
-  postAnswerTrend.add(addAnswerResponse.timings.duration);
 
   putQuestionHelpfulTrend.add(updateQHelpfulResponse.timings.duration);
   putQuestionReportedTrend.add(updateQReportedResponse.timings.duration);

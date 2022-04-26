@@ -9,8 +9,9 @@ module.exports = {
       const count = req.query.count || 5;
       const size = page * count;
       const result = await models.getQuestions(productId, size);
-      res.send({ productId, results: result.rows[0].results });
+      res.send({ product_id: productId, results: result.rows[0].results || [] });
     } catch (err) {
+      console.log(err);
       res.status(404).send('Error: invalid product id provided');
     }
   },

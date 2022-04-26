@@ -105,3 +105,5 @@ dist
 
 # CSV
 csv/
+
+.DS_Store

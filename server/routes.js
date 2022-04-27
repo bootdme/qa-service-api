@@ -17,6 +17,8 @@ router.put('/qa/questions/:question_id/report', markQReported);
 router.put('/qa/answers/:answer_id/helpful', markAHelpful);
 router.put('/qa/answers/:answer_id/report', markAReported);
 
-router.get('loaderio-fa67137a1a407d110e80f8306068e698.txt');
+router.get('/loaderio-fa67137a1a407d110e80f8306068e698.txt', (req, res) => {
+  res.sendStatus(200).send('Load');
+});
 
 module.exports = router;

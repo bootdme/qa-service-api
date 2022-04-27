@@ -1,10 +1,7 @@
 const { createServer } = require('./create');
+require('dotenv').config();
 
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config();
-}
-
-const { PORT } = process.env || 3001;
+const PORT = process.env.PORT || 3000;
 
 const app = createServer();
 

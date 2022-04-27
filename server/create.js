@@ -11,7 +11,7 @@ const createServer = () => {
   app.use(express.urlencoded({ extended: true }));
   app.use(cors(corsOptions));
 
-  app.use('/qa/', routes);
+  app.use('/', routes);
 
   return app;
 };

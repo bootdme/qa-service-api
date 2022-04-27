@@ -6,15 +6,15 @@ const {
   markQHelpful, markQReported, markAHelpful, markAReported,
 } = require('./controllers');
 
-router.get('/questions', getQuestions);
-router.get('/questions/:question_id/answers', getAnswers);
+router.get('/qa/questions', getQuestions);
+router.get('/qa/questions/:question_id/answers', getAnswers);
 
-router.post('/questions', addQuestion);
-router.post('/questions/:question_id/answers', addAnswer);
+router.post('/qa/questions', addQuestion);
+router.post('/qa/questions/:question_id/answers', addAnswer);
 
-router.put('/questions/:question_id/helpful', markQHelpful);
-router.put('/questions/:question_id/report', markQReported);
-router.put('/answers/:answer_id/helpful', markAHelpful);
-router.put('/answers/:answer_id/report', markAReported);
+router.put('/qa/questions/:question_id/helpful', markQHelpful);
+router.put('/qa/questions/:question_id/report', markQReported);
+router.put('/qa/answers/:answer_id/helpful', markAHelpful);
+router.put('/qa/answers/:answer_id/report', markAReported);
 
 module.exports = router;

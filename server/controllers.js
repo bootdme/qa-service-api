@@ -11,7 +11,6 @@ module.exports = {
       const result = await models.getQuestions(productId, size);
       res.send({ product_id: productId, results: result.rows[0].results || [] });
     } catch (err) {
-      console.log(err);
       res.status(404).send('Error: invalid product id provided');
     }
   },
@@ -23,7 +22,7 @@ module.exports = {
       const size = page * count;
       const result = await models.getAnswers(questionId, size);
       res.send({
-        question: questionId, page, count, results: result.rows[0].results,
+        question: questionId, page, count, results: result.rows[0].results || [],
       });
     } catch (err) {
       res.status(404).send('Error: invalid question id provided');

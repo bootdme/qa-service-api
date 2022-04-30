@@ -13,7 +13,7 @@ module.exports = {
       const size = page * count;
       const result = await models.getQuestions(productId, size);
       const t1 = performance.now() - t0;
-      fs.writeFile(`${os.hostname()} logs`, `${os.hostname()} response time: ${t1}`, (err) => {
+      fs.writeFile(`${os.hostname()}.txt`, `${os.hostname()} response time: ${t1}`, (err) => {
         if (err) {
           console.log(err);
         }

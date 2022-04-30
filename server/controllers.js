@@ -1,23 +1,14 @@
-const fs = require('fs');
-const os = require('os');
 const models = require('./models');
 
 module.exports = {
   // Controller routes here
   getQuestions: async (req, res) => {
     try {
-      const t0 = performance.now();
       const productId = req.query.product_id || '';
       const page = req.query.page || 1;
       const count = req.query.count || 5;
       const size = page * count;
       const result = await models.getQuestions(productId, size);
-      const t1 = performance.now() - t0;
-      fs.writeFile(`${os.hostname()}.txt`, `${os.hostname()} response time: ${t1}`, (err) => {
-        if (err) {
-          console.log(err);
-        }
-      });
       res.send({ product_id: productId, results: result.rows[0].results || [] });
     } catch (err) {
       res.status(404).send('Error: invalid product id provided');

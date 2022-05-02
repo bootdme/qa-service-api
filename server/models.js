@@ -8,7 +8,6 @@ pool.on('error', (err) => {
 
 module.exports = {
   getQuestions: (productId, size) => {
-    // TODO: Fix updating helpful/reported, question_id needs to be in the right place (ORDER BY bug)
     const psql = `
       SELECT
       Json_agg(
@@ -82,10 +81,10 @@ module.exports = {
         )
       ) AS results
     FROM answers a
-    WHERE a.question_id = $1 LIMIT $2`;
+    WHERE a.question_id = $1
+    LIMIT $2`;
     return pool.query(psql, [questionId, size]);
   },
-  // TODO: Figure out date conversion instead of converting when running schema
   addQuestion: (body, name, email, productId) => {
     const date = new Date();
     const psql = `

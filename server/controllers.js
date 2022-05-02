@@ -1,7 +1,6 @@
 const models = require('./models');
 
 module.exports = {
-  // Controller routes here
   getQuestions: async (req, res) => {
     try {
       const productId = req.query.product_id || '';

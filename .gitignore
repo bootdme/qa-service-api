@@ -107,5 +107,3 @@ dist
 csv/
 
 .DS_Store
-
-qa.pgsql

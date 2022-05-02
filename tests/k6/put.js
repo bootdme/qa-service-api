@@ -2,6 +2,10 @@ import http from 'k6/http';
 import { sleep } from 'k6';
 import { Trend } from 'k6/metrics';
 
+require('dotenv').config();
+
+const PORT = process.env.PORT || 3000;
+
 const putQuestionHelpfulTrend = new Trend('Update Question Helpful');
 const putQuestionReportedTrend = new Trend('Update Question Reported');
 const putAnswerHelpfulTrend = new Trend('Update Answer Helpful');
@@ -28,8 +32,8 @@ export const options = {
 };
 
 export default () => {
-  const questionAPI = 'http://localhost:8008/qa/questions';
-  const answerAPI = 'http://localhost:8008/qa/answers';
+  const questionAPI = `http://localhost:${PORT}/qa/questions`;
+  const answerAPI = `http://localhost:${PORT}/qa/answers`;
   const maxTwo = 3523507;
   const maxThree = 6879325;
   const randomIdTwo = Math.floor(Math.random() * maxTwo);

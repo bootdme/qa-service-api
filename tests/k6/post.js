@@ -2,6 +2,10 @@ import http from 'k6/http';
 import { sleep } from 'k6';
 import { Trend } from 'k6/metrics';
 
+require('dotenv').config();
+
+const PORT = process.env.PORT || 3000;
+
 const postQuestionTrend = new Trend('Add Question');
 const postAnswerTrend = new Trend('Add Answer');
 
@@ -26,7 +30,7 @@ export const options = {
 };
 
 export default () => {
-  const questionAPI = 'http://localhost:8008/qa/questions';
+  const questionAPI = `http://localhost:${PORT}/qa/questions`;
   const maxOne = 1000011;
   const maxTwo = 3523507;
   const randomIdOne = Math.floor(Math.random() * maxOne);

@@ -13,6 +13,8 @@
 3. Run `npm run start` to start the Node server.
 4. Run `npm run test` to execute test suites.
 
+Link to [CSV Dummy Data](https://drive.google.com/drive/folders/1iINCGsL9PPc_t6A33TlO2HzBxHwNjG-I?usp=sharing)
+
 ## Service Routes
 GET routes:
 - `/qa/questions` retrieves a list of questions for a particular product.

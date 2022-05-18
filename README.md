@@ -10,10 +10,9 @@
 ## Repository Installation
 1. Run `git clone` to clone the repository.
 2. Run `npm install` to install dependencies.
-3. Run `npm run start` to start the Node server.
-4. Run `npm run test` to execute test suites.
-
-Link to [CSV Dummy Data](https://drive.google.com/drive/folders/1iINCGsL9PPc_t6A33TlO2HzBxHwNjG-I?usp=sharing)
+3. Download [CSV Data](https://drive.google.com/drive/folders/1iINCGsL9PPc_t6A33TlO2HzBxHwNjG-I?usp=sharing) and extract `csv/` folder to root directory.
+4. Run `npm run start` to start the Node server.
+5. Run `npm run test` to execute test suites.
 
 ## Service Routes
 GET routes:
